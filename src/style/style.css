@@ -1,0 +1,128 @@
+body {
+    /* background-color: #000000; */
+    background: #000000;
+    color: white;
+    /* background-color: white; */
+    /* font-family: sans-serif; */
+}
+
+a {
+    text-decoration: unset;
+}
+
+.btn-pink {
+    background: #CD2E71;
+    color: white;
+    width: 100px;
+    height: 40px;
+    border-radius: 5px;
+    border: solid 1px #CD2E71;
+}
+
+.btn-pink:hover {
+    color: unset;
+    box-shadow: unset;
+}
+
+.bnt-white {
+    width: 140px;
+    color: white;
+    background-color: unset;
+    border: unset;
+    font-size: 18px;
+}
+
+.bg-modal {
+    background-color: #0D0D0D;
+    outline: solid 1px white;
+}
+
+.fc-pink {
+    color: #CD2E71;
+}
+
+.placeholder-edit {
+    background-color: #4d4949;
+    color: white;
+    border: solid 2px #BCBCBC 25%;
+}
+
+.placeholder-edit:focus {
+    box-shadow: 0px 0px 5px 3px #CD2E71;
+}
+
+.placeholder-edit::placeholder {
+    color: grey;
+    opacity: 1;
+    /* Firefox */
+}
+
+.placeholder-edit:-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    color: grey;
+}
+
+.placeholder-edit::-ms-input-placeholder {
+    /* Microsoft Edge */
+    color: red;
+}
+
+/* poster */
+.poster-container {
+    position: relative;
+    text-align: center;
+    color: white;
+}
+
+.poster-caption {
+    position: absolute;
+    top: 15px;
+    left: 150px;
+    text-align: start;
+    width: 65%;
+    flex-wrap: wrap;
+}
+
+.poster-desc {
+    font-size: 14px;
+}
+
+/* end poster */
+
+.t-pink-f18 {
+    color: #CD2E71;
+    font-size: 18px;
+}
+
+.t-grey-f18 {
+    color: #616161;
+    font-size: 18px;
+}
+
+.fs-36 {
+    font-size: 36px;
+}
+
+.status-finished {
+    position: relative;
+    background: #00ff481c;
+    border-radius: 2px;
+    text-align: center;
+    color: #00FF47;
+    font-size: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-pink {
+    color: #CD2E71;
+}
+
+.fs-12 {
+    font-size: 12px;
+}
+
+.fs-14 {
+    font-size: 14px;
+}
