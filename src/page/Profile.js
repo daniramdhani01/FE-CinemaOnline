@@ -100,7 +100,7 @@ export default function Profile() {
                         History Transaction
                     </div>
                     {/* data here */}
-                    {film.map((item, index) => {
+                    {!film.id ? <></> : film.map((item, index) => {
                         return (
                             <div className='p-3 mb-3' style={{ background: 'rgba(205, 46, 113, 0.44)' }} key={index}>
                                 <div className='fs-14'>
