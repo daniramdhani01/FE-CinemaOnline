@@ -13,7 +13,6 @@ import clapperboard from '../assets/icons/clapperboard.svg'
 import addfilmIcon from '../assets/icons/addfilmIcon.svg' //addfilmIcon for admin
 import logout from '../assets/icons/logout.svg'
 import user from '../assets/icons/user.svg'
-// import user_icon from '../assets/dummyPic/user_icon.png'
 import zain from '../assets/dummyPic/zain.png'
 import Icon from '../assets/icons/Icon.png'
 
@@ -32,6 +31,8 @@ export default function Header({ isAdmin }) {
         navigate('/landing-page')
     }
 
+    // console.log(state.user.image)
+
     return (
         <div className='d-flex align-items-center mt-4' style={{ hight: 50 }}>
             <div className='w-50'>
@@ -45,12 +46,12 @@ export default function Header({ isAdmin }) {
                         <>
                             <Dropdown>
                                 <Dropdown.Toggle id="dropdown-button-dark-example1" variant="unset" style={{ boxShadow: 'unset' }}>
-                                    {state.user.image ? state.user.image.slice(-4) != 'null' ?
+                                    {state.user.image ? state.user.image.slice(-4) != 'null' && state.user.image.slice(-9) != 'undefined' ?
                                         <img src={state.user.image} style={{ height: 50, width: 50, objectFit: 'cover', border: 'solid 2px  #CD2E71', boxSizing: 'border-box', borderRadius: 10000 }} />
                                         :
-                                        <img src={zain} style={{ height: 50, width: 50, objectFit: 'cover', border: 'solid 2px  #CD2E71', boxSizing: 'border-box', borderRadius: 10000 }} />
+                                        <img src={user} style={{ height: 50, width: 50, objectFit: 'cover', border: 'solid 2px  #CD2E71', boxSizing: 'border-box', borderRadius: 10000 }} />
                                         :
-                                        <img src={zain} style={{ height: 50, width: 50, objectFit: 'cover', border: 'solid 2px  #CD2E71', boxSizing: 'border-box', borderRadius: 10000 }} />
+                                        <img src={user} style={{ height: 50, width: 50, objectFit: 'cover', border: 'solid 2px  #CD2E71', boxSizing: 'border-box', borderRadius: 10000 }} />
                                     }
                                 </Dropdown.Toggle>
 

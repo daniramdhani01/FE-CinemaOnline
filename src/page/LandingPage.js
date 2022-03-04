@@ -11,8 +11,6 @@ import Buy from '../components/Buy'
 import Login from '../components/Login'
 import Register from '../components/Register'
 
-import poster from '../assets/dummyPic/poster.png'
-
 export default function LandingPage() {
 
     document.title = 'Cinema Online'
@@ -60,7 +58,7 @@ export default function LandingPage() {
                     style={{ width: '85%' }}
                     film[0].thumbnail
                 /> */}
-                <img src={film[0].thumbnail} style={{ width: '85%', maxHeight: 370, objectFit: 'cover' }} />
+                <img src={film[0].poster} style={{ width: '85%', maxHeight: 370, objectFit: 'cover' }} />
                 <div className="poster-caption">
                     <h1 className="mb-3">
                         {/* <div style={{ color: ' #A52620' }}>DEAD</div> <div>POOL</div> */}

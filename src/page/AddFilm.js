@@ -19,6 +19,7 @@ export default function AddFilm() {
     const [form, setForm] = useState({
         title: '',
         thumbnail: '',
+        poster: '',
         category: '',
         price: '',
         link: '',
@@ -37,7 +38,7 @@ export default function AddFilm() {
             setPreview(url);
         }
     }
-    // console.log(form)
+    console.log(form)
 
     const handleSubmit = async (e) => {
         try {
@@ -56,6 +57,9 @@ export default function AddFilm() {
 
             if (form.thumbnail[0]) {
                 formData.set('thumbnail', form.thumbnail[0], form.thumbnail[0].name)
+            }
+            if (form.poster[0]) {
+                formData.set('poster', form.poster[0], form.poster[0].name)
             }
             formData.set('title', form.title)
             formData.set('category', form.category)
@@ -108,7 +112,7 @@ export default function AddFilm() {
                 </div>
                 <Form onSubmit={handleSubmit}>
                     <div className='d-flex'>
-                        <Form.Group className="w-75 mb-3">
+                        <Form.Group className="w-50 mb-3">
                             <Form.Control
                                 className="placeholder-edit"
                                 as="input"
@@ -117,7 +121,19 @@ export default function AddFilm() {
                                 onChange={handleChange}
                                 placeholder='Title' />
                         </Form.Group>
-                        <Form.Group controlId='uploadImage' className='w-25 ps-3'>
+                        <Form.Group controlId='poster' className='w-25 ps-3'>
+                            <Form.Label className='btn d-flex justify-content-center align-items-center text-secondary'
+                                style={{
+                                    background: 'rgba(210, 210, 210, 0.25)',
+                                    border: '1px solid #D2D2D2',
+                                    boxSizing: 'border-box',
+                                    borderRadius: 5,
+                                    height: 40
+                                }}>
+                                Attach Poster <img src={attach} className='ms-3 img-fluid' /></Form.Label>
+                            <Form.Control type='file' name='poster' hidden onChange={handleChange} />
+                        </Form.Group>
+                        <Form.Group controlId='thumbnail' className='w-25 ps-3'>
                             <Form.Label className='btn d-flex justify-content-center align-items-center text-secondary'
                                 style={{
                                     background: 'rgba(210, 210, 210, 0.25)',

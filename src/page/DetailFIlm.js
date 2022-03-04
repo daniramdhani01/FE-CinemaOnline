@@ -12,9 +12,6 @@ import Buy from '../components/Buy'
 import Login from '../components/Login'
 import Register from '../components/Register'
 
-//import image and icon
-import TnJscene from '../assets/dummyPic/TnJscene.png'
-
 function ModalAlert(props) {
     const { status } = props
     console.log(status)

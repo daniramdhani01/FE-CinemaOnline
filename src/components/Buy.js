@@ -69,9 +69,8 @@ export default function Buy(props) {
                     </Alert>
                 );
                 setMessage(alert);
-                setTimeout(() => {
-                    navigate('/detail-film/' + form.idFilm)
-                }, 1000)
+                // navigate('/detail-film/' + form.idFilm)
+                navigate('/profile')
             } else {
                 const alert = (
                     <Alert variant="danger" className="py-1 text-center">

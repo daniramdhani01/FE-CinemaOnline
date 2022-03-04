@@ -6,7 +6,7 @@ import { API } from '../config/api'
 import Header from '../components/Header'
 
 //import pic
-import zain from '../assets/dummyPic/zain.png'
+import user from '../assets/icons/user.svg'
 
 
 export default function Profile() {
@@ -34,8 +34,8 @@ export default function Profile() {
 
     const getProfile = () => {
 
-        API.get('/film/' + state.user.id)
-            .then((res) => setFilm(res.data.data.mylist))
+        API.get('/transac/' + state.user.id)
+            .then((res) => setFilm(res.data.data.transac))
             .catch((err) => console.log(err))
 
         API.get('/user/' + state.user.id)
@@ -58,6 +58,7 @@ export default function Profile() {
         const d = new Date(day)
         return (d.getDate() + ' ' + month[d.getMonth()] + ' ' + d.getFullYear())
     }
+    console.log(profile.image)
     return (
         <>
             <Header />
@@ -67,7 +68,11 @@ export default function Profile() {
                 <div className='col-7'>
                     <div className='fs-36 fw-bold'>My Profile</div >
                     <div className='d-flex mt-4'>
-                        <img src={profile.image} style={{ width: 200 }} />
+                        {profile.image.slice(-4) == 'null' ?
+                            <img src={user} style={{ width: 200 }} />
+                            :
+                            <img src={profile.image} style={{ width: 200 }} />
+                        }
                         <div className='ps-4'>
                             <div className='t-pink-f18'>
                                 Full Name
