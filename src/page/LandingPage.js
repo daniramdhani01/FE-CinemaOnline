@@ -46,7 +46,7 @@ export default function LandingPage() {
         getFilm()
     }, [])
 
-
+    console.log(film)
     return (
         <>
             <Header />
