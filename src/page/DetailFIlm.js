@@ -83,6 +83,8 @@ export default function DetailFilm() {
             .catch((err) => { console.log(err) })
         navigate('/')
     }
+
+    console.log(film)
     return (
         <>
             <Header />
