@@ -84,7 +84,7 @@ export default function DetailFilm() {
         navigate('/')
     }
 
-    console.log(film)
+    // console.log(film)
     return (
         <>
             <Header />
