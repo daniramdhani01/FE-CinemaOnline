@@ -48,6 +48,7 @@ export default function AddFilm() {
             // Content-type: application/json
             const config = {
                 headers: {
+                    Authorization: "Bearer " + localStorage.token,
                     'Content-Type': 'application/json',
                 },
             };
