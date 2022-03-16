@@ -38,7 +38,7 @@ export default function AddFilm() {
             setPreview(url);
         }
     }
-    console.log(form)
+    // console.log(form)
 
     const handleSubmit = async (e) => {
         try {

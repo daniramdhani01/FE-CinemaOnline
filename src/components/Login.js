@@ -49,7 +49,7 @@ export default function Login(props) {
 
             // Insert data user to database here ...
             const response = await API.post('/login', body, config);
-            console.log(response.data.data.user)
+            // console.log(response.data.data.user)
 
             // Notification
             if (response.data.status == 'success') {
