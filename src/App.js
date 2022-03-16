@@ -47,7 +47,15 @@ function App() {
 
   const checkUser = async () => {
     try {
-      const response = await API.get('/check-auth');
+
+      const config = {
+        headers: {
+          Authorization: "Bearer " + localStorage.token,
+          'Content-Type': 'application/json',
+        },
+      };
+
+      const response = await API.get('/check-auth', config);
 
       // If the token incorrect
       if (response.status === 'failed') {
