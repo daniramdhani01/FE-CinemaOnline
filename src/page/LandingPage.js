@@ -52,16 +52,9 @@ export default function LandingPage() {
             <Header />
             {/* poster here */}
             <div className="poster-container my-4 d-flex justify-content-center">
-                {/* <ReactPlayer className='img-fluid' style={{ maxHeight: 500 }}
-                    url={film[0].link} light={true}
-                    // onClickPreview={handlePlay}
-                    style={{ width: '85%' }}
-                    film[0].thumbnail
-                /> */}
-                <img src={film[0].poster} style={{ width: '85%', maxHeight: 370, objectFit: 'cover' }} />
+                <img src={film[0].poster} style={{ width: 1000, height: 370, objectFit: 'cover' }} />
                 <div className="poster-caption">
                     <h1 className="mb-3">
-                        {/* <div style={{ color: ' #A52620' }}>DEAD</div> <div>POOL</div> */}
                         <div style={{ color: ' #A52620' }}>{film[0].title}</div>
                     </h1>
                     <h5>
@@ -72,7 +65,6 @@ export default function LandingPage() {
                     </h5>
                     <div className="poster-desc">
                         {film[0].desc}
-                        {/* Hold onto your chimichangas, folks. From the studio that brought you all 3 Taken films comes the block-busting, fourth-wall-breaking masterpiece about Marvel Comics’ sexiest anti-hero! Starring God’s perfect idiot Ryan Reynolds and a bunch of other "actors," DEADPOOL is a giddy slice of awesomeness packed with more twists than Deadpool’s enemies’ intestines and more action than prom night. Amazeballs! */}
                     </div>
 
                     <button type="button" className="btn-pink mt-4"
@@ -113,11 +105,11 @@ export default function LandingPage() {
                 <Container className='mt-3 d-flex flex-wrap'>
                     {film.map((item, index) => {
                         return (
-                            <div className='col-2 p-2' key={item.id}>
+                            <div className='col-2 p-2' key={item.id} style={{ height: 225 }} >
                                 <button onClick={state.isLogin ? () => navigate('/detail-film/' + item.id) : ''}
                                     style={{ background: 'unset', border: 'unset' }}>
                                     {/* <Link to={'/detail-film/' + item.id}> */}
-                                    <img src={item.thumbnail} className='rounded img-fluid' />
+                                    <img src={item.thumbnail} className='rounded img-fluid' style={{ maxHeight: 225, objectFit: 'cover' }} />
                                     {/* </Link> */}
                                 </button>
                             </div>
