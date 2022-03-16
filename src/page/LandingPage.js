@@ -28,6 +28,7 @@ export default function LandingPage() {
         link: '',
         price: '',
         thumbnail: '',
+        poster: '',
         title: '',
         updatedAt: '',
     }])
@@ -46,13 +47,13 @@ export default function LandingPage() {
         getFilm()
     }, [])
 
-
+    // console.log(film)
     return (
         <>
             <Header />
-            {/* poster here */}
-            {film ?
+            {film[0] ?
                 <>
+                    {/* poster here */}
                     <div className="poster-container my-4 d-flex justify-content-center">
                         <img src={film[0].poster} style={{ width: 1000, height: 370, objectFit: 'cover' }} />
                         <div className="poster-caption">
@@ -99,7 +100,7 @@ export default function LandingPage() {
                         </div>
                     </div>
 
-            //  list film here
+                    {/* list film here */}
                     <div className='mb-3'>
                         <h5>
                             List Film
@@ -120,7 +121,10 @@ export default function LandingPage() {
                         </Container>
                     </div>
                 </>
-                : <></>}
+                :
+                <div className='d-flex align-items-center justify-content-center' style={{ height: '80vh', }}>
+                    <h4>No Data Found</h4>
+                </div>}
         </>
     )
 }
