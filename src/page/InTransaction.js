@@ -54,6 +54,21 @@ export default function InTransaction() {
     useEffect(() => {
         getData()
         setIsUpdate(false)
+
+        return () => {
+            setTransac([{
+                buktiTF: '',
+                createdAt: '',
+                film: { title: '' },
+                id: '',
+                idFilm: '',
+                iduser: '',
+                status: '',
+                updatedAt: '',
+                user: { fullname: '' },
+                accountNum: '',
+            }])
+        }
     }, [isupdate])
 
     return (

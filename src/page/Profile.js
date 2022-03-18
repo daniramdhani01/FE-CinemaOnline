@@ -45,6 +45,27 @@ export default function Profile() {
 
     useEffect(() => {
         getProfile()
+
+        return () => {
+
+            setFilm([{
+                film: {
+                    thumbnail: '',
+                    id: '',
+                    price: '',
+                    createdAt: '',
+                },
+            }])
+
+            setProfile({
+                id: '',
+                fullname: '',
+                email: '',
+                phone: '',
+                image: '',
+                isAdmin: '',
+            })
+        }
     }, [state])
 
     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
@@ -58,7 +79,7 @@ export default function Profile() {
         const d = new Date(day)
         return (d.getDate() + ' ' + month[d.getMonth()] + ' ' + d.getFullYear())
     }
-    console.log(profile.image)
+    // console.log(profile.image)
     return (
         <>
             <Header />

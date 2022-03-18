@@ -17,9 +17,9 @@ export default function LandingPage() {
 
     const navigate = useNavigate()
     const [state] = useContext(UserContext)
-    const [buyModal, setBuyModal] = useState(false)
-    const [modalRegister, setModalRegister] = useState(false)
-    const [modalLogin, setModalLogin] = useState(false)
+    const [buyModal, setbuymodal] = useState(false)
+    const [modalRegister, setmodalregister] = useState(false)
+    const [modalLogin, setmodallogin] = useState(false)
     const [film, setFilm] = useState([{
         category: '',
         createdAt: '',
@@ -45,9 +45,24 @@ export default function LandingPage() {
 
     useEffect(() => {
         getFilm()
+
+        return () => {
+            setFilm([{
+                category: '',
+                createdAt: '',
+                desc: '',
+                id: '',
+                link: '',
+                price: '',
+                thumbnail: '',
+                poster: '',
+                title: '',
+                updatedAt: '',
+            }])
+        }
     }, [])
 
-    // console.log(film)
+    // console.log(state)
     return (
         <>
             <Header />
@@ -71,31 +86,32 @@ export default function LandingPage() {
                             </div>
 
                             <button type="button" className="btn-pink mt-4"
-                                onClick={state.isLogin ? () => setBuyModal(true) : () => setModalLogin(true)}
+                                onClick={state.isLogin ? () => setbuymodal(true) : () => setmodallogin(true)}
                             >
                                 Buy Now</button>
                             <Buy
                                 show={buyModal}
-                                onHide={() => setBuyModal(false)}
+                                onHide={() => setbuymodal(false)}
                                 idfilm={film[0].id}
-                                buyModal={setBuyModal}
-                                setModalLogin={setModalLogin}
-                                setModalRegister={setModalRegister}
+                                buyModal={setbuymodal}
+                                setmodallogin={setmodallogin}
+                                setmodalregister={setmodalregister}
                             />
 
                             <Register
                                 show={modalRegister}
-                                onHide={() => setModalRegister(false)}
-                                buyModal={setBuyModal}
-                                setModalLogin={setModalLogin}
-                                setModalRegister={setModalRegister} />
+                                onHide={() => setmodalregister(false)}
+                                buyModal={setbuymodal}
+                                setmodallogin={setmodallogin}
+                                setmodalregister={setmodalregister}
+                            />
 
                             <Login
                                 show={modalLogin}
-                                buyModal={setBuyModal}
-                                onHide={() => setModalLogin(false)}
-                                setModalLogin={setModalRegister}
-                                setModalRegister={setModalLogin}
+                                buyModal={setbuymodal}
+                                onHide={() => setmodallogin(false)}
+                                setmodallogin={setmodalregister}
+                                setmodalregister={setmodallogin}
                             />
                         </div>
                     </div>
@@ -109,11 +125,10 @@ export default function LandingPage() {
                             {film && film.map((item, index) => {
                                 return (
                                     <div className='col-2 p-2' key={item.id} style={{ height: 225 }} >
-                                        <button onClick={state.isLogin ? () => navigate('/detail-film/' + item.id) : ''}
+                                        <button
+                                            onClick={() => navigate('/detail-film/' + item.id)}
                                             style={{ background: 'unset', border: 'unset' }}>
-                                            {/* <Link to={'/detail-film/' + item.id}> */}
                                             <img src={item.thumbnail} className='rounded img-fluid' style={{ maxHeight: 225, objectFit: 'cover' }} />
-                                            {/* </Link> */}
                                         </button>
                                     </div>
                                 )

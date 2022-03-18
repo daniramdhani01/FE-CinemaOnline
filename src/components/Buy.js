@@ -10,7 +10,7 @@ import attach from '../assets/icons/attach.svg'
 
 export default function Buy(props) {
     const navigate = useNavigate()
-    const { setModalRegister, setModalLogin, idfilm, titlefilm, pricefilm } = props
+    const { setmodalregister, setmodallogin, idfilm, titlefilm, pricefilm } = props
 
     const [message, setMessage] = useState(null);
     const [state] = useContext(UserContext)

@@ -21,8 +21,8 @@ export default function Header({ isAdmin }) {
     const navigate = useNavigate()
     const [state, dispatch] = useContext(UserContext)
 
-    const [modalRegister, setModalRegister] = useState(false)
-    const [modalLogin, setModalLogin] = useState(false)
+    const [modalRegister, setmodalregister] = useState(false)
+    const [modalLogin, setmodallogin] = useState(false)
 
     const handleLogout = () => {
         dispatch({
@@ -90,19 +90,19 @@ export default function Header({ isAdmin }) {
                     </>
                     :
                     <>
-                        <button type="button" className="bnt-white" onClick={() => { setModalLogin(true) }}>Login</button>
-                        <button type="button" className="btn-pink" onClick={() => { setModalRegister(true) }}>Register</button>
+                        <button type="button" className="bnt-white" onClick={() => { setmodallogin(true) }}>Login</button>
+                        <button type="button" className="btn-pink" onClick={() => { setmodalregister(true) }}>Register</button>
                         <Register
                             show={modalRegister}
-                            onHide={() => setModalRegister(false)}
-                            setModalLogin={setModalLogin}
-                            setModalRegister={setModalRegister} />
+                            onHide={() => setmodalregister(false)}
+                            setmodallogin={setmodallogin}
+                            setmodalregister={setmodalregister} />
 
                         <Login
                             show={modalLogin}
-                            onHide={() => setModalLogin(false)}
-                            setModalLogin={setModalRegister}
-                            setModalRegister={setModalLogin} />
+                            onHide={() => setmodallogin(false)}
+                            setmodallogin={setmodalregister}
+                            setmodalregister={setmodallogin} />
                     </>
                 }
             </div>

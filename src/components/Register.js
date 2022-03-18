@@ -8,11 +8,11 @@ import { API } from '../config/api';
 export default function Register(props) {
     const navigate = useNavigate()
     const [state, dispatch] = useContext(UserContext)
-    const { setModalRegister, setModalLogin } = props
+    const { setmodalregister, setmodallogin } = props
 
     const handleOpenModal = () => {
-        setModalRegister(false)
-        setModalLogin(true)
+        setmodalregister(false)
+        setmodallogin(true)
     }
 
     const [message, setMessage] = useState(null);

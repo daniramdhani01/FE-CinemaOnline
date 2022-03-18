@@ -7,13 +7,12 @@ import { API } from '../config/api';
 
 export default function Login(props) {
     const navigate = useNavigate()
-    const { setModalRegister, setModalLogin } = props
-    // console.log(props)
+    const { setmodalregister, setmodallogin } = props
     const [state, dispatch] = useContext(UserContext)
 
     const handleOpenModal = () => {
-        setModalRegister(false)
-        setModalLogin(true)
+        setmodalregister(false)
+        setmodallogin(true)
     }
 
     const [message, setMessage] = useState(null);

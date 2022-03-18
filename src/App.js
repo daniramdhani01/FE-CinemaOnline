@@ -47,7 +47,6 @@ function App() {
 
   const checkUser = async () => {
     try {
-
       const config = {
         headers: {
           Authorization: "Bearer " + localStorage.token,
@@ -58,14 +57,14 @@ function App() {
       const response = await API.get('/check-auth', config);
 
       // If the token incorrect
-      if (response.status === 'failed') {
+      if (response.data.status === 'failed') {
         return dispatch({
           type: 'AUTH_ERROR',
         });
       }
 
       // Get user data
-      let payload = response.data.data.user;
+      let payload = response.data.data.user
 
       // Get token from local storage
       payload.token = localStorage.token;
@@ -83,7 +82,6 @@ function App() {
   useEffect(() => {
     checkUser();
   }, []);
-
 
   return (
     <Routes>

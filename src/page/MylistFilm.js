@@ -28,6 +28,15 @@ export default function MylistFilm() {
 
     useEffect(() => {
         getMyList()
+
+        return () => {
+            setFilm([{
+                film: {
+                    thumbnail: '',
+                    id: '',
+                },
+            }])
+        }
     }, [state])
     return (
         <>
