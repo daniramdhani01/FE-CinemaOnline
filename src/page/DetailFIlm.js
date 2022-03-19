@@ -35,10 +35,12 @@ export default function DetailFilm() {
 
     const [state] = useContext(UserContext)
     const [status, setStatus] = useState('-')
-    const [buyModal, setBuyModal] = useState(false)
     const [modalAlert, setModalAlert] = useState(false)
-    const [modalRegister, setModalRegister] = useState(false)
-    const [modalLogin, setModalLogin] = useState(false)
+
+    const [buyModal, setbuymodal] = useState(false)
+    const [modalRegister, setmodalregister] = useState(false)
+    const [modalLogin, setmodallogin] = useState(false)
+
     const [film, setFilm] = useState({
         category: '',
         createdAt: '',
@@ -104,29 +106,29 @@ export default function DetailFilm() {
                         {status == '-' || status == 'Rejected' ?
                             <div className='w-25 d-flex justify-content-end'>
                                 <button type="button" className="btn-pink"
-                                    onClick={state.isLogin ? () => setBuyModal(true) : () => setModalLogin(true)}>
+                                    onClick={state.isLogin ? () => setbuymodal(true) : () => setmodallogin(true)}>
                                     Buy Now
                                 </button>
                                 <Buy
                                     show={buyModal}
-                                    onHide={() => setBuyModal(false)}
+                                    onHide={() => setbuymodal(false)}
                                     idfilm={film.id}
                                     titlefilm={film.title}
                                     pricefilm={film.price}
                                 />
                                 <Register
                                     show={modalRegister}
-                                    onHide={() => setModalRegister(false)}
-                                    buyModal={setBuyModal}
-                                    setModalLogin={setModalLogin}
-                                    setModalRegister={setModalRegister} />
+                                    onHide={() => setmodalregister(false)}
+                                    buyModal={setbuymodal}
+                                    setmodallogin={setmodallogin}
+                                    setmodalregister={setmodalregister} />
 
                                 <Login
                                     show={modalLogin}
-                                    buyModal={setBuyModal}
-                                    onHide={() => setModalLogin(false)}
-                                    setModalLogin={setModalRegister}
-                                    setModalRegister={setModalLogin}
+                                    buyModal={setbuymodal}
+                                    onHide={() => setmodallogin(false)}
+                                    setmodallogin={setmodalregister}
+                                    setmodalregister={setmodallogin}
                                 />
                             </div> :
                             <></>
