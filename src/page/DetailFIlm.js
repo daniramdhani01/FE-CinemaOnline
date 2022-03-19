@@ -14,7 +14,7 @@ import Register from '../components/Register'
 
 function ModalAlert(props) {
     const { status } = props
-    console.log(status)
+    // console.log(status)
     return (
         <Modal {...props} centered size='md' className='text-center' style={{ color: '#469F74' }}>
             <Modal.Body>

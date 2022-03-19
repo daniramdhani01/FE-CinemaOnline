@@ -70,7 +70,7 @@ export default function AddFilm() {
 
             const response = await API.post('/film', formData, config)
 
-            // console.log(response.data.data.film.id)
+            // console.log(response.data)
 
             if (response.data.status == 'success') {
                 const alert = (

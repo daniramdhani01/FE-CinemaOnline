@@ -62,7 +62,7 @@ export default function LandingPage() {
         }
     }, [])
 
-    // console.log(state)
+    // console.log(film)
     return (
         <>
             <Header />

@@ -45,6 +45,7 @@ export default function Buy(props) {
             // Content-type: application/json
             const config = {
                 headers: {
+                    Authorization: "Bearer " + localStorage.token,
                     'Content-type': 'application/json',
                 },
             };
