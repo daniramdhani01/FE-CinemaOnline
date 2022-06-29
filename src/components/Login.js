@@ -6,6 +6,7 @@ import { UserContext } from '../context/userContext';
 import { API } from '../config/api';
 
 export default function Login(props) {
+    const { show, onHide } = props
     const navigate = useNavigate()
     const { setmodalregister, setmodallogin } = props
     const [state, dispatch] = useContext(UserContext)
@@ -89,7 +90,7 @@ export default function Login(props) {
 
     return (
         <>
-            <Modal {...props} centered size='sm'>
+            <Modal show={show} onHide={onHide} centered size='sm'>
                 <Modal.Body className='rounded-3 bg-modal '>
                     <Modal.Title className='mb-4 fs-2 fc-pink'>Login</Modal.Title>
                     {message && message}

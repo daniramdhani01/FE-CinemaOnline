@@ -9,6 +9,7 @@ import { API } from '../config/api';
 import attach from '../assets/icons/attach.svg'
 
 export default function Buy(props) {
+    const { show, onHide } = props
     const navigate = useNavigate()
     const { setmodalregister, setmodallogin, idfilm, titlefilm, pricefilm } = props
 
@@ -94,7 +95,7 @@ export default function Buy(props) {
 
     return (
         <>
-            <Modal {...props} centered size='md'>
+            <Modal show={show} onHide={onHide} centered size='md'>
                 <Modal.Body className='rounded-3 bg-modal '>
                     <Modal.Title className='mb-4 text-center' style={{ fontSize: 24 }}>
                         Cinema<span className='text-pink'>Online</span> : 0981312323

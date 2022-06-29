@@ -6,6 +6,7 @@ import { UserContext } from '../context/userContext';
 import { API } from '../config/api';
 
 export default function Register(props) {
+    const { show, onHide } = props
     const navigate = useNavigate()
     const [state, dispatch] = useContext(UserContext)
     const { setmodalregister, setmodallogin } = props
@@ -88,7 +89,7 @@ export default function Register(props) {
 
     return (
         <>
-            <Modal {...props} centered size='sm'>
+            <Modal show={show} onHide={onHide} centered size='sm'>
                 <Modal.Body className='rounded-3 bg-modal '>
                     <Modal.Title className='mb-4 fs-2 fc-pink'>Register</Modal.Title>
                     {message && message}

@@ -79,7 +79,6 @@ export default function Profile() {
         const d = new Date(day)
         return (d.getDate() + ' ' + month[d.getMonth()] + ' ' + d.getFullYear())
     }
-    // console.log(profile.image)
     return (
         <>
             <Header />
@@ -121,7 +120,7 @@ export default function Profile() {
                         History Transaction
                     </div>
                     {/* data here */}
-                    {!film.id ? <></> : film.map((item, index) => {
+                    {!film[0].id ? <></> : film.map((item, index) => {
                         return (
                             <div className='p-3 mb-3' style={{ background: 'rgba(205, 46, 113, 0.44)' }} key={index}>
                                 <div className='fs-14'>

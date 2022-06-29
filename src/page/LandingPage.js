@@ -17,7 +17,7 @@ export default function LandingPage() {
 
     const navigate = useNavigate()
     const [state] = useContext(UserContext)
-    const [buyModal, setbuymodal] = useState(false)
+    const [buymodal, setbuymodal] = useState(false)
     const [modalRegister, setmodalregister] = useState(false)
     const [modalLogin, setmodallogin] = useState(false)
     const [film, setFilm] = useState([{
@@ -90,10 +90,10 @@ export default function LandingPage() {
                             >
                                 Buy Now</button>
                             <Buy
-                                show={buyModal}
+                                show={buymodal}
                                 onHide={() => setbuymodal(false)}
                                 idfilm={film[0].id}
-                                buyModal={setbuymodal}
+                                buymodal={setbuymodal}
                                 setmodallogin={setmodallogin}
                                 setmodalregister={setmodalregister}
                             />
@@ -101,14 +101,14 @@ export default function LandingPage() {
                             <Register
                                 show={modalRegister}
                                 onHide={() => setmodalregister(false)}
-                                buyModal={setbuymodal}
+                                buymodal={setbuymodal}
                                 setmodallogin={setmodallogin}
                                 setmodalregister={setmodalregister}
                             />
 
                             <Login
                                 show={modalLogin}
-                                buyModal={setbuymodal}
+                                buymodal={setbuymodal}
                                 onHide={() => setmodallogin(false)}
                                 setmodallogin={setmodalregister}
                                 setmodalregister={setmodallogin}
