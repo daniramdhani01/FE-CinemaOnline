@@ -7,6 +7,7 @@ import { API } from '../config/api';
 
 //import image & icon
 import attach from '../assets/icons/attach.svg'
+import { getLocalStorage } from '../helper';
 
 export default function Buy(props) {
     const { show, onHide } = props
@@ -46,7 +47,7 @@ export default function Buy(props) {
             // Content-type: application/json
             const config = {
                 headers: {
-                    Authorization: "Bearer " + localStorage.token,
+                    Authorization: "Bearer " + getLocalStorage("AUS","token"),
                     'Content-type': 'application/json',
                 },
             };
@@ -61,7 +62,7 @@ export default function Buy(props) {
             formData.set('accountNum', form.accountNum)
 
             // Insert data user to database here ...
-            const response = await API.post('/transac/' + state.user.id, formData, config);
+            const response = await API.post('/transac', formData, config);
 
             // Notification
             if (response.data.status == 'success') {

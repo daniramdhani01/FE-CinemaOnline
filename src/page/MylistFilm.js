@@ -21,7 +21,7 @@ export default function MylistFilm() {
     }])
 
     const getMyList = () => {
-        API.get('/film/' + state.user.id)
+        API.get('/my-film')
             .then((res) => setFilm(res.data.data.mylist))
             .catch((err) => console.log(err))
     }
@@ -37,7 +37,7 @@ export default function MylistFilm() {
                 },
             }])
         }
-    }, [state])
+    }, [])
     return (
         <>
             <Header />

@@ -10,16 +10,19 @@ import Header from "../components/Header"
 import Buy from '../components/Buy'
 import Login from '../components/Login'
 import Register from '../components/Register'
+import { getLocalStorage } from "../helper"
 
 export default function LandingPage() {
 
     document.title = 'Cinema Online'
 
+    const { isAdmin, isLogin} =  getLocalStorage("AUS")
     const navigate = useNavigate()
     const [state] = useContext(UserContext)
     const [buymodal, setbuymodal] = useState(false)
     const [modalRegister, setmodalregister] = useState(false)
     const [modalLogin, setmodallogin] = useState(false)
+    const [status, setStatus] = useState('-')
     const [film, setFilm] = useState([{
         category: '',
         createdAt: '',
@@ -62,7 +65,19 @@ export default function LandingPage() {
         }
     }, [])
 
-    // console.log(film)
+    useEffect(()=>{
+        if(isLogin && !isAdmin && !!film[0].id){
+            API.get('/detail-film/' + film[0].id)
+            .then((res) => {
+                const response = res.data.data
+                setStatus(response.status)
+            }).catch((err) => {
+                console.log(err)
+            })
+        }
+    },[isAdmin, film])
+
+    
     return (
         <>
             <Header />
@@ -85,10 +100,16 @@ export default function LandingPage() {
                                 {film[0].desc}
                             </div>
 
+                            {isAdmin || status === "Approved" ? 
+                            <button type="button" className="btn-pink mt-4" onClick={() => navigate('/detail-film/' + film[0].id)}>
+                                Play Now
+                            </button>
+                            :
                             <button type="button" className="btn-pink mt-4"
                                 onClick={state.isLogin ? () => setbuymodal(true) : () => setmodallogin(true)}
                             >
                                 Buy Now</button>
+                            }
                             <Buy
                                 show={buymodal}
                                 onHide={() => setbuymodal(false)}

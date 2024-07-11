@@ -14,14 +14,13 @@ import Register from '../components/Register'
 
 function ModalAlert(props) {
     const { status } = props
-    // console.log(status)
     return (
         <Modal {...props} centered size='md' className='text-center' style={{ color: '#469F74' }}>
             <Modal.Body>
                 {status == 'Pending' ?
                     'thank you for buying this film, please wait 1x24 hours because your transaction is in process'
                     :
-                    'please buy this film if you want to watch'
+                    'Please buy this film if you want to watch'
                 }
             </Modal.Body>
         </Modal>
@@ -54,23 +53,11 @@ export default function DetailFilm() {
     })
 
     const getFilm = () => {
-        // Create Configuration Content-type here ...
-        // Content-type: application/json
-        const config = {
-            headers: {
-                'Content-type': 'application/json',
-            },
-        };
-
-        // Convert form data to string here ...
-        const body = JSON.stringify({ iduser: state.user.id });
-
-        API.post('/detail-film/' + id, body, config)
+        API.get('/detail-film/' + id)
             .then((res) => {
                 const response = res.data.data
                 setFilm(response.film)
-                setStatus(response.status)
-                // console.log(response)
+                setStatus(state.user.isAdmin ? "Approved" : response.status)
             }).catch((err) => {
                 console.log(err)
             })
@@ -82,8 +69,8 @@ export default function DetailFilm() {
 
     const handleDelete = () => {
         API.get('/film-delete/' + film.id)
+            .then(()=>navigate('/'))
             .catch((err) => { console.log(err) })
-        navigate('/')
     }
 
     // console.log(film)
@@ -103,7 +90,7 @@ export default function DetailFilm() {
                         <div className='w-75'>
                             <h1>{film.title}</h1>
                         </div>
-                        {status == '-' || status == 'Rejected' ?
+                        {(status == '-' || status == 'Rejected') ?
                             <div className='w-25 d-flex justify-content-end'>
                                 <button type="button" className="btn-pink"
                                     onClick={state.isLogin ? () => setbuymodal(true) : () => setmodallogin(true)}>

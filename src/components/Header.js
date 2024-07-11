@@ -28,10 +28,8 @@ export default function Header({ isAdmin }) {
         dispatch({
             type: 'LOGOUT',
         })
-        navigate('/landing-page')
+        navigate('/')
     }
-
-    // console.log(state.user.image)
 
     return (
         <div className='d-flex align-items-center mt-4' style={{ hight: 50 }}>

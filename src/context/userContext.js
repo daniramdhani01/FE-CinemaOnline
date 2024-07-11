@@ -1,4 +1,5 @@
 import { createContext, useReducer } from 'react'
+import { setLocalStorage } from '../helper';
 
 export const UserContext = createContext();
 
@@ -15,7 +16,8 @@ const reducer = (state, action) => {
         case 'USER_SUCCESS':
         case 'LOGIN_SUCCESS':
             // Set item token to localStorage here ...
-            localStorage.setItem('token', payload.token);
+            setLocalStorage("AUS",{...payload, isLogin: true})
+            
             return {
                 isLogin: true,
                 user: payload,
@@ -24,7 +26,7 @@ const reducer = (state, action) => {
         case 'AUTH_ERROR':
         case 'LOGOUT':
             // Remove item token from localStorage here ...
-            localStorage.removeItem('token');
+            localStorage.clear();
             return {
                 isLogin: false,
                 user: {},

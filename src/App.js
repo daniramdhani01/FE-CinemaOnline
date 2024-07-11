@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { Routes, Route, useNavigate, } from 'react-router-dom'
+import { Routes, Route, useNavigate, Navigate, } from 'react-router-dom'
 import { UserContext } from './context/userContext';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/style.css'
@@ -12,44 +12,16 @@ import Profile from './page/Profile';
 import MylistFilm from './page/MylistFilm';
 import InTransaction from './page/InTransaction';
 import AddFilm from './page/AddFilm';
-
-if (localStorage.token) {
-  setAuthToken(localStorage.token);
-}
+import { getLocalStorage } from './helper';
 
 function App() {
-  const navigate = useNavigate()
-
   const [state, dispatch] = useContext(UserContext)
-
-  // console.log(state)
-
-  useEffect(() => {
-    if (localStorage.token) {
-      setAuthToken(localStorage.token);
-    }
-
-    // Redirect Auth
-    if (state.isLogin == false) {
-      navigate("/landing-page");
-      // console.log('update')
-    }
-    else {
-      if (state.user.isAdmin === true) {
-        navigate("/list-transaction");
-      }
-      else {
-        navigate("/");
-      }
-    }
-  }, [state]);
-
 
   const checkUser = async () => {
     try {
       const config = {
         headers: {
-          Authorization: "Bearer " + localStorage.token,
+          Authorization: "Bearer " + getLocalStorage("AUS","token"),
           'Content-Type': 'application/json',
         },
       };
@@ -67,7 +39,7 @@ function App() {
       let payload = response.data.data.user
 
       // Get token from local storage
-      payload.token = localStorage.token;
+      payload.token = getLocalStorage("AUS","token");
 
       // Send data to useContext
       dispatch({
@@ -85,13 +57,16 @@ function App() {
 
   return (
     <Routes>
-      <Route exact path='/landing-page' element={<LandingPage />} />
       <Route exact path='/' element={<LandingPage />} />
       <Route exact path='/detail-film/:id' element={<DetailFilm />} />
-      <Route exact path='/profile' element={<Profile />} />
-      <Route exact path='/my-list-film' element={<MylistFilm />} />
-      <Route exact path='/list-transaction' element={<InTransaction />} />
-      <Route exact path='/add-film' element={<AddFilm />} />
+      {getLocalStorage("AUS","isLogin") && 
+      <>
+        <Route exact path='/profile' element={<Profile />} />
+        <Route exact path='/my-list-film' element={<MylistFilm />} />
+        <Route exact path='/list-transaction' element={getLocalStorage("AUS","isAdmin") ? <InTransaction /> : <Navigate to={"/"}/>} />
+        <Route exact path='/add-film' element={<AddFilm />} />
+      </>}
+      <Route path='*' element={<Navigate to={"/"}/>} />
     </Routes>
   )
 }

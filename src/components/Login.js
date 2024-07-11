@@ -1,15 +1,16 @@
 import { useState, useContext } from 'react'
-import { useNavigate } from 'react-router-dom';
 import { Button, Modal, InputGroup, FormControl, Alert, Form } from 'react-bootstrap'
 import '../style/style.css'
 import { UserContext } from '../context/userContext';
 import { API } from '../config/api';
+import { setLocalStorage } from '../helper';
+import { useNavigate } from 'react-router-dom';
 
 export default function Login(props) {
     const { show, onHide } = props
-    const navigate = useNavigate()
     const { setmodalregister, setmodallogin } = props
     const [state, dispatch] = useContext(UserContext)
+    const navigate = useNavigate()
 
     const handleOpenModal = () => {
         setmodalregister(false)
@@ -49,7 +50,6 @@ export default function Login(props) {
 
             // Insert data user to database here ...
             const response = await API.post('/login', body, config);
-            // console.log(response.data.data.user)
 
             // Notification
             if (response.data.status == 'success') {
@@ -57,6 +57,8 @@ export default function Login(props) {
                     type: 'LOGIN_SUCCESS',
                     payload: response.data.data.user,
                 })
+                const nextRoute = response.data.data.user.isAdmin ? "/list-transaction" : "/"
+                navigate(nextRoute)
                 const alert = (
                     <Alert variant="success" className="py-1 text-center">
                         Login success

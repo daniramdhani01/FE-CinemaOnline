@@ -8,6 +8,7 @@ import Header from "../components/Header";
 //import icon
 import attach from '../assets/icons/attach1.svg'
 import { API } from '../config/api';
+import { getLocalStorage } from '../helper';
 
 export default function AddFilm() {
     const title = 'Add Film'
@@ -27,6 +28,7 @@ export default function AddFilm() {
     });
 
     const handleChange = (e) => {
+
         setForm({
             ...form,
             [e.target.name]: e.target.type === 'file' ? e.target.files : e.target.value,
@@ -34,11 +36,13 @@ export default function AddFilm() {
 
         // Create image url for preview
         if (e.target.type === 'file') {
+            //validasi
+            if(e.target.files[0].type?.includes("image") === false) return
+            
             let url = URL.createObjectURL(e.target.files[0]);
             setPreview(url);
         }
     }
-    // console.log(form)
 
     const handleSubmit = async (e) => {
         try {
@@ -48,7 +52,7 @@ export default function AddFilm() {
             // Content-type: application/json
             const config = {
                 headers: {
-                    Authorization: "Bearer " + localStorage.token,
+                    Authorization: "Bearer " + getLocalStorage("AUS","token"),
                     'Content-Type': 'application/json',
                 },
             };
@@ -96,11 +100,10 @@ export default function AddFilm() {
         } catch (err) {
             const alert = (
                 <Alert variant="danger" className="py-1 text-center">
-                    Failed!
+                    Failed! {err.response.data?.message}
                 </Alert>
             );
             setMessage(alert);
-            console.log(err);
         }
     }
 
@@ -132,7 +135,7 @@ export default function AddFilm() {
                                     height: 40
                                 }}>
                                 Attach Poster <img src={attach} className='ms-3 img-fluid' /></Form.Label>
-                            <Form.Control type='file' name='poster' hidden onChange={handleChange} />
+                            <Form.Control type='file' name='poster' hidden onChange={handleChange} accept='image/*'/>
                         </Form.Group>
                         <Form.Group controlId='thumbnail' className='w-25 ps-3'>
                             <Form.Label className='btn d-flex justify-content-center align-items-center text-secondary'
@@ -144,7 +147,7 @@ export default function AddFilm() {
                                     height: 40
                                 }}>
                                 Attach Thumbnail <img src={attach} className='ms-3 img-fluid' /></Form.Label>
-                            <Form.Control type='file' name='thumbnail' hidden onChange={handleChange} />
+                            <Form.Control type='file' name='thumbnail' hidden onChange={handleChange} accept='image/*'/>
                         </Form.Group>
                     </div>
                     {preview ? preview.slice(-5) == '/null' ? '' :

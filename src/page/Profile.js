@@ -33,14 +33,15 @@ export default function Profile() {
     // const [history, setHistory] = useState()
 
     const getProfile = () => {
-
-        API.get('/transac/' + state.user.id)
+        try {
+            API.get('/transac')
             .then((res) => setFilm(res.data.data.transac))
-            .catch((err) => console.log(err))
 
-        API.get('/user/' + state.user.id)
-            .then((res) => setProfile(res.data.data.user))
-            .catch((err) => console.log(err))
+            API.get('/user')
+                .then((res) => setProfile(res.data.data.user))
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     useEffect(() => {
@@ -66,7 +67,7 @@ export default function Profile() {
                 isAdmin: '',
             })
         }
-    }, [state])
+    }, [])
 
     const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
     const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -120,7 +121,7 @@ export default function Profile() {
                         History Transaction
                     </div>
                     {/* data here */}
-                    {!film[0].id ? <></> : film.map((item, index) => {
+                    {!film[0]?.id ? <></> : film.map((item, index) => {
                         return (
                             <div className='p-3 mb-3' style={{ background: 'rgba(205, 46, 113, 0.44)' }} key={index}>
                                 <div className='fs-14'>

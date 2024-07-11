@@ -27,8 +27,7 @@ export default function InTransaction() {
 
     const getData = async () => {
         try {
-            const response = await API.get('/transac')
-            // console.log(response.data)
+            const response = await API.get('/incoming-transac')
             setTransac(response.data.data.transac)
         } catch (err) {
             console.log(err)
@@ -38,22 +37,21 @@ export default function InTransaction() {
     const handleApprove = (id) => {
         API.patch('/approve/' + id)
             .catch((err) => console.log(err))
-        setIsUpdate(true)
+            .finally(()=>setIsUpdate(!isupdate))
     }
     const handleReject = (id) => {
         API.patch('/reject/' + id)
             .catch((err) => console.log(err))
-        setIsUpdate(true)
+            .finally(()=>setIsUpdate(!isupdate))
     }
     const handlePending = (id) => {
         API.patch('/pending/' + id)
             .catch((err) => console.log(err))
-        setIsUpdate(true)
+            .finally(()=>setIsUpdate(!isupdate))
     }
 
     useEffect(() => {
         getData()
-        setIsUpdate(false)
 
         return () => {
             setTransac([{
@@ -97,7 +95,7 @@ export default function InTransaction() {
                                     <td >{index + 1}</td>
                                     <td>{item.user.fullname}</td>
                                     <td>
-                                        <a href={item.buktiTF} className='text-white'>
+                                        <a href={item.buktiTF} className='text-white' target='_blank'>
                                             {item.buktiTF}
                                         </a>
                                     </td>
