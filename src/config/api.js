@@ -1,9 +1,10 @@
 import axios from 'axios';
 import { getLocalStorage } from '../helper';
 
+const baseURL = process.env.REACT_APP_BASE_URL+"/api/v1/"
+
 export const API = axios.create({
-    // baseURL: "https://be-cinema-online.herokuapp.com/api/v1/",
-    baseURL: "http://localhost:3001/api/v1/",
+    baseURL
 });
 
 API.interceptors.request.use(async (config) => {
