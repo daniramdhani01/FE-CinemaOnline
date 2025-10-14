@@ -1,6 +1,6 @@
 import { UserContext } from '../context/userContext'
 import { useState, useContext } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Dropdown, } from 'react-bootstrap'
 import '../style/style.css'
 

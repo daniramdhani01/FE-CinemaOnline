@@ -1,16 +1,22 @@
-import { useState, useContext } from 'react'
-import { Button, Modal, InputGroup, FormControl, Alert, Form } from 'react-bootstrap'
-import '../style/style.css'
+import { useState, useContext } from 'react';
+import { Button, Modal, InputGroup, FormControl, Alert, Form } from 'react-bootstrap';
+import '../style/style.css';
 import { UserContext } from '../context/userContext';
-import { API } from '../config/api';
-import { setLocalStorage } from '../helper';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { loginRequest } from '../config/services';
+import { QUERY_KEYS } from '../config/queryKeys';
 
 export default function Login(props) {
     const { show, onHide } = props
     const { setmodalregister, setmodallogin } = props
-    const [state, dispatch] = useContext(UserContext)
+    const [, dispatch] = useContext(UserContext)
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
+
+    const loginMutation = useMutation({
+        mutationFn: loginRequest,
+    })
 
     const handleOpenModal = () => {
         setmodalregister(false)
@@ -24,8 +30,6 @@ export default function Login(props) {
         password: '',
     });
 
-    const { email, password } = form;
-
     const handleChange = (e) => {
         setForm({
             ...form,
@@ -37,43 +41,29 @@ export default function Login(props) {
         try {
             e.preventDefault();
 
-            // Create Configuration Content-type here ...
-            // Content-type: application/json
-            const config = {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            };
+            const response = await loginMutation.mutateAsync(form);
 
-            // Convert form data to string here ...
-            const body = JSON.stringify(form);
-
-            // Insert data user to database here ...
-            const response = await API.post('/login', body, config);
-
-            // Notification
-            if (response.data.status == 'success') {
+            if (response.status === 'success') {
                 dispatch({
                     type: 'LOGIN_SUCCESS',
-                    payload: response.data.data.user,
+                    payload: response.data.user,
                 })
-                const nextRoute = response.data.data.user.isAdmin ? "/list-transaction" : "/"
+                const nextRoute = response.data.user.isAdmin ? "/list-transaction" : "/"
                 navigate(nextRoute)
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH });
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PROFILE });
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_TRANSACTIONS });
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MY_FILMS });
                 const alert = (
                     <Alert variant="success" className="py-1 text-center">
                         Login success
                     </Alert>
                 );
                 setMessage(alert);
-
-                // setInterval(() => {
-                //     navigate('/')
-                // }, 1000)
-
             } else {
                 const alert = (
                     <Alert variant="danger" className="py-1 text-center">
-                        Failed! {response.data.message}
+                        Failed! {response.message}
                     </Alert>
                 );
                 setMessage(alert);
@@ -121,7 +111,15 @@ export default function Login(props) {
                             Login
                         </Button>
                         <div className="d-flex justify-content-center mb-2">
-                            Don't have an account ? Klik <a className='ms-1 text-white font-weight-bolder fw-bolder' onClick={handleOpenModal}> Here </a>
+                            Don't have an account ? Klik
+                            <button
+                                type="button"
+                                className='ms-1 text-white font-weight-bolder fw-bolder'
+                                onClick={handleOpenModal}
+                                style={{ background: 'transparent', border: 'none', padding: 0 }}
+                            >
+                                Here
+                            </button>
                         </div>
                     </Form>
                 </Modal.Body>

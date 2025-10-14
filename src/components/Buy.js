@@ -1,26 +1,35 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Modal, InputGroup, FormControl, Form, Alert } from 'react-bootstrap'
-import '../style/style.css'
-import { UserContext } from '../context/userContext';
-import { API } from '../config/api';
+import { Button, Modal, InputGroup, FormControl, Form, Alert } from 'react-bootstrap';
+import '../style/style.css';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { createTransactionRequest } from '../config/services';
 
 //import image & icon
-import attach from '../assets/icons/attach.svg'
-import { getLocalStorage } from '../helper';
+import attach from '../assets/icons/attach.svg';
+import { QUERY_KEYS } from '../config/queryKeys';
 
 export default function Buy(props) {
     const { show, onHide } = props
     const navigate = useNavigate()
-    const { setmodalregister, setmodallogin, idfilm, titlefilm, pricefilm } = props
+    const { idfilm, titlefilm, pricefilm } = props
 
     const [message, setMessage] = useState(null);
-    const [state] = useContext(UserContext)
     const [preview, setPreview] = useState(null); //For image preview
     const [form, setForm] = useState({
         idFilm: '',
         image: '',
         accountNum: '',
+    });
+
+    const queryClient = useQueryClient();
+    const { mutateAsync: createTransaction, isLoading } = useMutation({
+        mutationFn: createTransactionRequest,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_TRANSACTIONS });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.MY_FILMS });
+            queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FILM_DETAIL(idfilm) });
+        },
     });
 
 
@@ -43,16 +52,6 @@ export default function Buy(props) {
         try {
             e.preventDefault();
 
-            // Create Configuration Content-type here ...
-            // Content-type: application/json
-            const config = {
-                headers: {
-                    Authorization: "Bearer " + getLocalStorage("AUS","token"),
-                    'Content-type': 'application/json',
-                },
-            };
-
-            // Convert form data to string here ...
             const formData = new FormData()
 
             if (form.image[0]) {
@@ -61,23 +60,20 @@ export default function Buy(props) {
             formData.set('idFilm', form.idFilm)
             formData.set('accountNum', form.accountNum)
 
-            // Insert data user to database here ...
-            const response = await API.post('/transac', formData, config);
+            const response = await createTransaction(formData);
 
-            // Notification
-            if (response.data.status == 'success') {
+            if (response.status === 'success') {
                 const alert = (
                     <Alert variant="success" className="py-1 text-center">
                         success
                     </Alert>
                 );
                 setMessage(alert);
-                // navigate('/detail-film/' + form.idFilm)
                 navigate('/profile')
             } else {
                 const alert = (
                     <Alert variant="danger" className="py-1 text-center">
-                        Failed! {response.data.message}
+                        Failed! {response.message}
                     </Alert>
                 );
                 setMessage(alert);
@@ -121,11 +117,13 @@ export default function Buy(props) {
                         </InputGroup>
                         <Form.Group controlId='uploadImage'>
                             <div className=''>
-                                <Form.Label className='btn btn-pink text-white' style={{ width: '36%' }}>Attach Payment <img src={attach} /></Form.Label>
+                                <Form.Label className='btn btn-pink text-white' style={{ width: '36%' }}>
+                                    Attach Payment <img src={attach} alt="" />
+                                </Form.Label>
                                 <span style={{ fontSize: 12, color: '#616161', marginLeft: 10 }}> *transfers can be made to holyways accounts</span>
                             </div>
                             <Form.Control type='file' name='image' hidden onChange={handleChange} />
-                            {preview ? preview.slice(-5) == '/null' ? '' :
+                            {preview ? preview.slice(-5) === '/null' ? '' :
                                 preview && (
                                     <div className='mb-4 mt-2 w-100 text-center'>
                                         <img
@@ -137,13 +135,13 @@ export default function Buy(props) {
                                                 boxShadow: '0px 0px 5px 3px #CD2E71',
                                                 borderRadius: 5,
                                             }}
-                                        // alt="preview"
+                                            alt="payment preview"
                                         />
                                     </div>
                                 ) : <div className='mb-4'></div>}
                         </Form.Group>
-                        <Button type='submit' variant="btn btn-pink" className='w-100 mb-3'>
-                            Pay
+                        <Button type='submit' variant="btn btn-pink" className='w-100 mb-3' disabled={isLoading}>
+                            {isLoading ? 'Processing...' : 'Pay'}
                         </Button>
                     </Form>
                 </Modal.Body>

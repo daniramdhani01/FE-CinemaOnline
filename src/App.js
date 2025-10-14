@@ -1,9 +1,11 @@
 import { useContext, useEffect } from 'react';
-import { Routes, Route, useNavigate, Navigate, } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { UserContext } from './context/userContext';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './style/style.css'
-import { API, setAuthToken } from './config/api';
+import { useQuery } from '@tanstack/react-query';
+import { QUERY_KEYS } from './config/queryKeys';
+import { checkAuthRequest } from './config/services';
 
 //import page
 import LandingPage from './page/LandingPage';
@@ -15,45 +17,37 @@ import AddFilm from './page/AddFilm';
 import { getLocalStorage } from './helper';
 
 function App() {
-  const [state, dispatch] = useContext(UserContext)
+  const [, dispatch] = useContext(UserContext)
 
-  const checkUser = async () => {
-    try {
-      const config = {
-        headers: {
-          Authorization: "Bearer " + getLocalStorage("AUS","token"),
-          'Content-Type': 'application/json',
-        },
-      };
+  const token = getLocalStorage("AUS","token");
 
-      const response = await API.get('/check-auth', config);
-
-      // If the token incorrect
-      if (response.data.status === 'failed') {
-        return dispatch({
-          type: 'AUTH_ERROR',
-        });
-      }
-
-      // Get user data
-      let payload = response.data.data.user
-
-      // Get token from local storage
-      payload.token = getLocalStorage("AUS","token");
-
-      // Send data to useContext
-      dispatch({
-        type: 'USER_SUCCESS',
-        payload,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { data: authData, error: authError } = useQuery({
+    queryKey: QUERY_KEYS.AUTH,
+    queryFn: checkAuthRequest,
+    enabled: Boolean(token),
+    staleTime: Infinity,
+    retry: false,
+  });
 
   useEffect(() => {
-    checkUser();
-  }, []);
+    if (!token) {
+      dispatch({ type: 'AUTH_ERROR' });
+      return;
+    }
+
+    if (authError || authData?.status === 'failed') {
+      dispatch({ type: 'AUTH_ERROR' });
+      return;
+    }
+
+    const userPayload = authData?.data?.user;
+    if (userPayload) {
+      dispatch({
+        type: 'USER_SUCCESS',
+        payload: { ...userPayload, token },
+      });
+    }
+  }, [authData, authError, token, dispatch]);
 
   return (
     <Routes>

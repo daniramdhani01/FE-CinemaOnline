@@ -1,15 +1,22 @@
-import { useState, useContext } from 'react'
+import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Modal, InputGroup, FormControl, Alert, Form } from 'react-bootstrap'
-import '../style/style.css'
+import { Button, Modal, InputGroup, FormControl, Alert, Form } from 'react-bootstrap';
+import '../style/style.css';
 import { UserContext } from '../context/userContext';
-import { API } from '../config/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { registerRequest } from '../config/services';
+import { QUERY_KEYS } from '../config/queryKeys';
 
 export default function Register(props) {
     const { show, onHide } = props
     const navigate = useNavigate()
-    const [state, dispatch] = useContext(UserContext)
+    const [, dispatch] = useContext(UserContext)
     const { setmodalregister, setmodallogin } = props
+    const queryClient = useQueryClient()
+
+    const registerMutation = useMutation({
+        mutationFn: registerRequest,
+    })
 
     const handleOpenModal = () => {
         setmodalregister(false)
@@ -24,8 +31,6 @@ export default function Register(props) {
         password: '',
     });
 
-    const { email, fullname, password } = form;
-
     const handleChange = (e) => {
         setForm({
             ...form,
@@ -37,26 +42,16 @@ export default function Register(props) {
         try {
             e.preventDefault();
 
-            // Create Configuration Content-type here ...
-            // Content-type: application/json
-            const config = {
-                headers: {
-                    'Content-type': 'application/json',
-                },
-            };
+            const response = await registerMutation.mutateAsync(form);
 
-            // Convert form data to string here ...
-            const body = JSON.stringify(form);
-
-            // Insert data user to database here ...
-            const response = await API.post('/register', body, config);
-
-            // Notification
-            if (response.data.status == 'success') {
+            if (response.status === 'success') {
                 dispatch({
                     type: 'LOGIN_SUCCESS',
                     payload: response.data.data.user,
                 })
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.AUTH });
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_PROFILE });
+                queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_TRANSACTIONS });
                 const alert = (
                     <Alert variant="success" className="py-1 text-center">
                         Your account has been create
@@ -64,13 +59,11 @@ export default function Register(props) {
                 );
                 setMessage(alert);
 
-                setInterval(() => {
-                    navigate('/')
-                }, 1000);
+                navigate('/')
             } else {
                 const alert = (
                     <Alert variant="danger" className="py-1 text-center">
-                        Failed! {response.data.message}
+                        Failed! {response.message}
                     </Alert>
                 );
                 setMessage(alert);
@@ -128,7 +121,15 @@ export default function Register(props) {
                             Register
                         </Button>
                         <div className="d-flex justify-content-center mb-2">
-                            Already have an account ?  Klik <a className='ms-1 text-white font-weight-bolder fw-bolder' onClick={handleOpenModal}> Here </a>
+                            Already have an account ?  Klik
+                            <button
+                                type="button"
+                                className='ms-1 text-white font-weight-bolder fw-bolder'
+                                onClick={handleOpenModal}
+                                style={{ background: 'transparent', border: 'none', padding: 0 }}
+                            >
+                                Here
+                            </button>
                         </div>
                     </Form>
                 </Modal.Body>
