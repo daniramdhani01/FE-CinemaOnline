@@ -12,6 +12,7 @@ import Register from "../components/Register";
 import { getLocalStorage } from "../helper";
 import { QUERY_KEYS } from "../config/queryKeys";
 import { fetchFilmDetail, fetchFilms } from "../config/services";
+import { PageLoading } from "../components/LoadingSpinner";
 
 export default function LandingPage() {
   document.title = "Cinema Online";
@@ -25,7 +26,7 @@ export default function LandingPage() {
   const [modalRegister, setmodalregister] = useState(false);
   const [modalLogin, setmodallogin] = useState(false);
 
-  const { data: films = [] } = useQuery({
+  const { data: films = [], isLoading: isLoadingFilms } = useQuery({
     queryKey: QUERY_KEYS.FILMS,
     queryFn: fetchFilms,
   });
@@ -45,7 +46,9 @@ export default function LandingPage() {
   return (
     <>
       <Header />
-      {heroFilm ? (
+      {isLoadingFilms ? (
+        <PageLoading message="Loading films..." />
+      ) : heroFilm ? (
         <>
           {/* poster here */}
           <div className="poster-container my-4 d-flex justify-content-center">

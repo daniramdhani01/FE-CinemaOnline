@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { Button, Modal, InputGroup, FormControl, Alert, Form } from 'react-bootstrap';
+import { Button, Modal, InputGroup, FormControl, Alert, Form, Spinner } from 'react-bootstrap';
 import '../style/style.css';
 import { UserContext } from '../context/userContext';
 import { useNavigate } from 'react-router-dom';
@@ -107,8 +107,27 @@ export default function Login(props) {
                                 onChange={handleChange}
                             />
                         </InputGroup>
-                        <Button type='submit' variant="btn btn-pink" className='w-100 mb-3'>
-                            Login
+                        <Button
+                            type='submit'
+                            variant="btn btn-pink"
+                            className='w-100 mb-3'
+                            disabled={loginMutation.isLoading}
+                        >
+                            {loginMutation.isLoading ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="me-2"
+                                    />
+                                    Logging in...
+                                </>
+                            ) : (
+                                'Login'
+                            )}
                         </Button>
                         <div className="d-flex justify-content-center mb-2">
                             Don't have an account ? Klik

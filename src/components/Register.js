@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Modal, InputGroup, FormControl, Alert, Form } from 'react-bootstrap';
+import { Button, Modal, InputGroup, FormControl, Alert, Form, Spinner } from 'react-bootstrap';
 import '../style/style.css';
 import { UserContext } from '../context/userContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -117,8 +117,27 @@ export default function Register(props) {
                                 onChange={handleChange}
                             />
                         </InputGroup>
-                        <Button type='submit' variant="btn btn-pink" className='w-100 mb-3'>
-                            Register
+                        <Button
+                            type='submit'
+                            variant="btn btn-pink"
+                            className='w-100 mb-3'
+                            disabled={registerMutation.isLoading}
+                        >
+                            {registerMutation.isLoading ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="me-2"
+                                    />
+                                    Registering...
+                                </>
+                            ) : (
+                                'Register'
+                            )}
                         </Button>
                         <div className="d-flex justify-content-center mb-2">
                             Already have an account ?  Klik

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Modal, InputGroup, FormControl, Form, Alert } from 'react-bootstrap';
+import { Button, Modal, InputGroup, FormControl, Form, Alert, Spinner } from 'react-bootstrap';
 import '../style/style.css';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createTransactionRequest } from '../config/services';
@@ -141,7 +141,21 @@ export default function Buy(props) {
                                 ) : <div className='mb-4'></div>}
                         </Form.Group>
                         <Button type='submit' variant="btn btn-pink" className='w-100 mb-3' disabled={isLoading}>
-                            {isLoading ? 'Processing...' : 'Pay'}
+                            {isLoading ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="border"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                        className="me-2"
+                                    />
+                                    Processing...
+                                </>
+                            ) : (
+                                'Pay'
+                            )}
                         </Button>
                     </Form>
                 </Modal.Body>
