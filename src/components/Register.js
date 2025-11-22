@@ -1,11 +1,12 @@
 import { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Modal, InputGroup, FormControl, Alert, Form, Spinner } from 'react-bootstrap';
+import { Button, Modal, FormControl, Alert, Form, Spinner } from 'react-bootstrap';
 import '../style/style.css';
 import { UserContext } from '../context/userContext';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { registerRequest } from '../config/services';
 import { QUERY_KEYS } from '../config/queryKeys';
+import { sanitizeInput, validateEmail, validatePassword, checkRateLimit, recordFailedLogin } from '../helper';
 
 export default function Register(props) {
     const { show, onHide } = props
@@ -24,6 +25,9 @@ export default function Register(props) {
     }
 
     const [message, setMessage] = useState(null);
+    const [passwordErrors, setPasswordErrors] = useState([]);
+    const [emailError, setEmailError] = useState('');
+    const [rateLimitError, setRateLimitError] = useState('');
 
     const [form, setForm] = useState({
         email: '',
@@ -32,15 +36,72 @@ export default function Register(props) {
     });
 
     const handleChange = (e) => {
+        const sanitizedValue = sanitizeInput(e.target.value);
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [e.target.name]: sanitizedValue,
         });
+
+        // Real-time validation
+        if (e.target.name === 'email') {
+            const isValidEmail = validateEmail(sanitizedValue);
+            setEmailError(isValidEmail ? '' : 'Please enter a valid email address');
+        } else if (e.target.name === 'password') {
+            const validation = validatePassword(sanitizedValue);
+            setPasswordErrors(validation.errors);
+        }
     };
 
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
+
+            // Check rate limiting
+            const rateLimit = checkRateLimit();
+            if (!rateLimit.allowed) {
+                setRateLimitError(rateLimit.message);
+                const alert = (
+                    <Alert variant="warning" className="py-1 text-center">
+                        {rateLimit.message}
+                    </Alert>
+                );
+                setMessage(alert);
+                return;
+            }
+
+            // Validate form inputs
+            const isEmailValid = validateEmail(form.email);
+            const passwordValidation = validatePassword(form.password);
+
+            if (!form.fullname || form.fullname.trim().length < 2) {
+                const alert = (
+                    <Alert variant="danger" className="py-1 text-center">
+                        Please enter a valid full name (at least 2 characters)
+                    </Alert>
+                );
+                setMessage(alert);
+                return;
+            }
+
+            if (!isEmailValid) {
+                const alert = (
+                    <Alert variant="danger" className="py-1 text-center">
+                        Please enter a valid email address
+                    </Alert>
+                );
+                setMessage(alert);
+                return;
+            }
+
+            if (!passwordValidation.isValid) {
+                const alert = (
+                    <Alert variant="danger" className="py-1 text-center">
+                        Password does not meet security requirements
+                    </Alert>
+                );
+                setMessage(alert);
+                return;
+            }
 
             const response = await registerMutation.mutateAsync(form);
 
@@ -54,13 +115,14 @@ export default function Register(props) {
                 queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USER_TRANSACTIONS });
                 const alert = (
                     <Alert variant="success" className="py-1 text-center">
-                        Your account has been create
+                        Your account has been created successfully
                     </Alert>
                 );
                 setMessage(alert);
 
                 navigate('/')
             } else {
+                recordFailedLogin();
                 const alert = (
                     <Alert variant="danger" className="py-1 text-center">
                         Failed! {response.message}
@@ -70,9 +132,10 @@ export default function Register(props) {
             }
 
         } catch (error) {
+            recordFailedLogin();
             const alert = (
                 <Alert variant="danger" className="py-1 text-center">
-                    Failed!
+                    Failed! Registration error occurred
                 </Alert>
             );
             setMessage(alert);
@@ -87,43 +150,64 @@ export default function Register(props) {
                     <Modal.Title className='mb-4 fs-2 fc-pink'>Register</Modal.Title>
                     {message && message}
                     <Form onSubmit={handleSubmit}>
-                        <InputGroup className="mb-3">
+                        <Form.Group className="mb-3">
+                            <Form.Label>Full Name</Form.Label>
                             <FormControl
-                                aria-describedby="inputGroup-sizing-default"
+                                placeholder='Full Name'
+                                name='fullname'
+                                type="text"
+                                className="placeholder-edit"
+                                onChange={handleChange}
+                                required
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Email</Form.Label>
+                            <FormControl
                                 placeholder='Email'
                                 name='email'
                                 type='email'
-                                className=" placeholder-edit"
+                                className={`placeholder-edit ${emailError ? 'is-invalid' : ''}`}
                                 onChange={handleChange}
+                                required
                             />
-                        </InputGroup>
-                        <InputGroup className="mb-3">
+                            {emailError && (
+                                <Form.Text className="text-danger">
+                                    {emailError}
+                                </Form.Text>
+                            )}
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Password</Form.Label>
                             <FormControl
-                                aria-describedby="inputGroup-sizing-default"
                                 placeholder='Password'
                                 name='password'
-                                className="placeholder-edit"
+                                className={`placeholder-edit ${passwordErrors.length > 0 ? 'is-invalid' : ''}`}
                                 type='password'
                                 onChange={handleChange}
+                                required
                             />
-                        </InputGroup>
-                        <InputGroup className="mb-3">
-                            <FormControl
-                                aria-describedby="inputGroup-sizing-default"
-                                placeholder='Full name'
-                                name='fullname'
-                                className="placeholder-edit"
-                                type="text"
-                                onChange={handleChange}
-                            />
-                        </InputGroup>
+                            {passwordErrors.length > 0 && (
+                                <div className="mt-2">
+                                    <small className="text-muted">Password must contain:</small>
+                                    <ul className="text-danger small mt-1 mb-0">
+                                        {passwordErrors.map((error, index) => (
+                                            <li key={index}>{error}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </Form.Group>
+
                         <Button
                             type='submit'
                             variant="btn btn-pink"
                             className='w-100 mb-3'
-                            disabled={registerMutation.isLoading}
+                            disabled={registerMutation.isPending || passwordErrors.length > 0 || emailError}
                         >
-                            {registerMutation.isLoading ? (
+                            {registerMutation.isPending ? (
                                 <>
                                     <Spinner
                                         as="span"
@@ -139,6 +223,13 @@ export default function Register(props) {
                                 'Register'
                             )}
                         </Button>
+
+                        {rateLimitError && (
+                            <Alert variant="warning" className="py-2 text-center small">
+                                {rateLimitError}
+                            </Alert>
+                        )}
+
                         <div className="d-flex justify-content-center mb-2">
                             Already have an account ?  Klik
                             <button

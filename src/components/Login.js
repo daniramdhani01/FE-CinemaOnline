@@ -1,11 +1,12 @@
 import { useState, useContext } from 'react';
-import { Button, Modal, InputGroup, FormControl, Alert, Form, Spinner } from 'react-bootstrap';
+import { Button, Modal, InputGroup, FormControl, Alert, Form, Spinner, ListGroup } from 'react-bootstrap';
 import '../style/style.css';
 import { UserContext } from '../context/userContext';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { loginRequest } from '../config/services';
 import { QUERY_KEYS } from '../config/queryKeys';
+import { sanitizeInput, validateEmail, validatePassword, checkRateLimit, recordFailedLogin, recordSuccessfulLogin } from '../helper';
 
 export default function Login(props) {
     const { show, onHide } = props
@@ -24,6 +25,9 @@ export default function Login(props) {
     }
 
     const [message, setMessage] = useState(null);
+    const [passwordErrors, setPasswordErrors] = useState([]);
+    const [emailError, setEmailError] = useState('');
+    const [rateLimitError, setRateLimitError] = useState('');
 
     const [form, setForm] = useState({
         email: '',
@@ -31,19 +35,67 @@ export default function Login(props) {
     });
 
     const handleChange = (e) => {
+        const sanitizedValue = sanitizeInput(e.target.value);
         setForm({
             ...form,
-            [e.target.name]: e.target.value,
+            [e.target.name]: sanitizedValue,
         });
+
+        // Real-time validation
+        if (e.target.name === 'email') {
+            const isValidEmail = validateEmail(sanitizedValue);
+            setEmailError(isValidEmail ? '' : 'Please enter a valid email address');
+        } else if (e.target.name === 'password') {
+            const validation = validatePassword(sanitizedValue);
+            setPasswordErrors(validation.errors);
+        }
     };
 
     const handleSubmit = async (e) => {
         try {
             e.preventDefault();
 
+            // Check rate limiting
+            const rateLimit = checkRateLimit();
+            if (!rateLimit.allowed) {
+                setRateLimitError(rateLimit.message);
+                const alert = (
+                    <Alert variant="warning" className="py-1 text-center">
+                        {rateLimit.message}
+                    </Alert>
+                );
+                setMessage(alert);
+                return;
+            }
+
+            // Validate form inputs
+            const isEmailValid = validateEmail(form.email);
+            const passwordValidation = validatePassword(form.password);
+
+            if (!isEmailValid) {
+                const alert = (
+                    <Alert variant="danger" className="py-1 text-center">
+                        Please enter a valid email address
+                    </Alert>
+                );
+                setMessage(alert);
+                return;
+            }
+
+            if (!passwordValidation.isValid) {
+                const alert = (
+                    <Alert variant="danger" className="py-1 text-center">
+                        Password does not meet security requirements
+                    </Alert>
+                );
+                setMessage(alert);
+                return;
+            }
+
             const response = await loginMutation.mutateAsync(form);
 
             if (response.status === 'success') {
+                recordSuccessfulLogin();
                 dispatch({
                     type: 'LOGIN_SUCCESS',
                     payload: response.data.user,
@@ -61,6 +113,7 @@ export default function Login(props) {
                 );
                 setMessage(alert);
             } else {
+                recordFailedLogin();
                 const alert = (
                     <Alert variant="danger" className="py-1 text-center">
                         Failed! {response.message}
@@ -70,9 +123,10 @@ export default function Login(props) {
             }
 
         } catch (error) {
+            recordFailedLogin();
             const alert = (
                 <Alert variant="danger" className="py-1 text-center">
-                    Failed!
+                    Failed! Invalid email or password
                 </Alert>
             );
             setMessage(alert);
@@ -87,33 +141,54 @@ export default function Login(props) {
                     <Modal.Title className='mb-4 fs-2 fc-pink'>Login</Modal.Title>
                     {message && message}
                     <Form onSubmit={handleSubmit}>
-                        <InputGroup className="mb-3">
+                        <Form.Group className="mb-3">
+                            <Form.Label>Email</Form.Label>
                             <FormControl
                                 aria-describedby="inputGroup-sizing-default"
                                 placeholder='Email'
                                 name='email'
                                 type='email'
-                                className=" placeholder-edit"
+                                className={`placeholder-edit ${emailError ? 'is-invalid' : ''}`}
                                 onChange={handleChange}
+                                required
                             />
-                        </InputGroup>
-                        <InputGroup className="mb-3">
+                            {emailError && (
+                                <Form.Text className="text-danger">
+                                    {emailError}
+                                </Form.Text>
+                            )}
+                        </Form.Group>
+
+                        <Form.Group className="mb-3">
+                            <Form.Label>Password</Form.Label>
                             <FormControl
                                 aria-describedby="inputGroup-sizing-default"
                                 placeholder='Password'
                                 name='password'
-                                className="placeholder-edit"
+                                className={`placeholder-edit ${passwordErrors.length > 0 ? 'is-invalid' : ''}`}
                                 type='password'
                                 onChange={handleChange}
+                                required
                             />
-                        </InputGroup>
+                            {passwordErrors.length > 0 && (
+                                <div className="mt-2">
+                                    <small className="text-muted">Password must contain:</small>
+                                    <ul className="text-danger small mt-1 mb-0">
+                                        {passwordErrors.map((error, index) => (
+                                            <li key={index}>{error}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
+                        </Form.Group>
+
                         <Button
                             type='submit'
                             variant="btn btn-pink"
                             className='w-100 mb-3'
-                            disabled={loginMutation.isLoading}
+                            disabled={loginMutation.isPending || passwordErrors.length > 0 || emailError}
                         >
-                            {loginMutation.isLoading ? (
+                            {loginMutation.isPending ? (
                                 <>
                                     <Spinner
                                         as="span"
@@ -129,6 +204,13 @@ export default function Login(props) {
                                 'Login'
                             )}
                         </Button>
+
+                        {rateLimitError && (
+                            <Alert variant="warning" className="py-2 text-center small">
+                                {rateLimitError}
+                            </Alert>
+                        )}
+
                         <div className="d-flex justify-content-center mb-2">
                             Don't have an account ? Klik
                             <button
