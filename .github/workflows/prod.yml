@@ -107,8 +107,8 @@ jobs:
 
       - name: Deploy via SSH
         run: |
-          ssh -p $SSH_PORT -o StrictHostKeyChecking=no \
-          $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
+          ssh -p ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no \
+          ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} /bin/bash << 'EOF'
           set -e
 
           echo '${{ secrets.PAT_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
