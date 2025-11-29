@@ -4,10 +4,10 @@ FROM node:22.15-alpine AS builder
 WORKDIR /app
 
 # Copy file yang dibutuhkan untuk install deps dulu (biar cache maksimal)
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
 # Install semua dependency (dev + prod)
-RUN npm ci
+RUN npm ci && npm cache clean --force
 
 # Copy seluruh source code
 COPY . .
