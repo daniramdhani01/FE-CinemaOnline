@@ -1,0 +1,150 @@
+name: Cinema Online FE React Deployment
+
+on:
+  push:
+    tags: [v*]
+    branches: [master]
+
+env:
+  NODE_VERSION: 22.15.0
+  DOCKER_IMAGE: ghcr.io/${{ github.repository_owner }}/fe-cinemaonline
+  SSH_HOST: ${{ secrets.SSH_HOST }}
+  SSH_USER: ${{ secrets.SSH_USER }}
+  SSH_PORT: ${{ secrets.SSH_PORT || '22' }}
+  SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+  CONTAINER_NAME: cinema-online-fe-prod
+  APP_PORT: 3000
+
+jobs:
+  initial-setup:
+    name: Unit Testing / Lint (optional)
+    runs-on: ubuntu-latest
+    environment: Production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Opsional, sesuaikan script di package.json
+      # - name: Run lint
+      #   run: npm run lint
+
+      # - name: Run test
+      #   run: npm test -- --watchAll=false
+
+  build-and-push:
+    name: Build & Push Docker Image
+    needs: initial-setup
+    runs-on: ubuntu-latest
+    environment: Production
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get image version
+        id: get-version
+        run: |
+          VERSION=$(jq -r .version package.json)
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.PAT_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ env.DOCKER_IMAGE }}:${{ steps.get-version.outputs.version }}
+            ${{ env.DOCKER_IMAGE }}:latest
+          build-args: |
+            REACT_APP_API_BASE_URL=${{ vars.REACT_APP_API_BASE_URL }}
+
+  containerizing:
+    name: Run Container on VPS
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    environment: Production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ env.SSH_PRIVATE_KEY }}
+
+      - name: Get version
+        id: get-version
+        run: |
+          VERSION=$(jq -r .version package.json)
+          echo "IMAGE_VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Deploy via SSH
+        run: |
+          ssh -p $SSH_PORT -o StrictHostKeyChecking=no \
+          $SSH_USER@$SSH_HOST /bin/bash << 'EOF'
+          set -e
+
+          echo '${{ secrets.PAT_TOKEN }}' | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+          FULL_IMAGE="${{ env.DOCKER_IMAGE }}:${{ env.IMAGE_VERSION }}"
+          echo "📦 Pulling image: $FULL_IMAGE"
+
+          if ! docker pull "$FULL_IMAGE"; then
+            echo '⚠️ Failed to pull versioned image, fallback to latest'
+            FULL_IMAGE="${{ env.DOCKER_IMAGE }}:latest"
+            docker pull "$FULL_IMAGE"
+          fi
+
+          # Hentikan container lama kalau ada
+          if docker container inspect ${{ env.CONTAINER_NAME }} >/dev/null 2>&1; then
+            echo "🛑 Stopping and removing existing container..."
+            docker container stop ${{ env.CONTAINER_NAME }}
+            docker container rm ${{ env.CONTAINER_NAME }}
+          else
+            echo "✅ No existing container named ${{ env.CONTAINER_NAME }} found."
+          fi
+
+          echo "🚀 Starting container $FULL_IMAGE"
+
+          # Pastikan network sudah ada (untuk komunikasi dengan backend)
+          docker network create cinema-network 2>/dev/null || true
+
+          docker run -d \
+            --name ${{ env.CONTAINER_NAME }} \
+            --network cinema-network \
+            --restart unless-stopped \
+            --label logging=promtail \
+            --label promtail.enable=true \
+            --init \
+            "$FULL_IMAGE"
+          
+          echo "✅ Frontend deployed successfully on port 3000"
+          echo "📝 Backend should be on port 3001"
+          EOF
