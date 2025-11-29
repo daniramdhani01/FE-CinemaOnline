@@ -80,7 +80,8 @@ jobs:
             ${{ env.DOCKER_IMAGE }}:${{ steps.get-version.outputs.version }}
             ${{ env.DOCKER_IMAGE }}:latest
           build-args: |
-            REACT_APP_API_BASE_URL=${{ vars.REACT_APP_API_BASE_URL }}
+            REACT_APP_ENCRYPTION_KEY=${{ secrets.REACT_APP_ENCRYPTION_KEY }}
+            REACT_APP_BASE_URL=${{ vars.REACT_APP_BASE_URL }}
 
   containerizing:
     name: Run Container on VPS

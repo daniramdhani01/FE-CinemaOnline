@@ -3,6 +3,14 @@ FROM node:22.15-alpine AS builder
 
 WORKDIR /app
 
+# Declare build arguments
+ARG REACT_APP_ENCRYPTION_KEY
+ARG REACT_APP_BASE_URL
+
+# Set as environment variables untuk build process
+ENV REACT_APP_ENCRYPTION_KEY=${REACT_APP_ENCRYPTION_KEY}
+ENV REACT_APP_BASE_URL=${REACT_APP_BASE_URL}
+
 # Copy file yang dibutuhkan untuk install deps dulu (biar cache maksimal)
 COPY package*.json ./
 
@@ -13,6 +21,7 @@ RUN npm ci && npm cache clean --force
 COPY . .
 
 # Build React App (create-react-app akan generate folder 'build')
+# Environment variables akan di-embed ke dalam build
 RUN npm run build
 
 # ===== STAGE 2: RUNTIME dengan Nginx =====
