@@ -138,6 +138,7 @@ jobs:
 
           docker run -d \
             --name ${{ env.CONTAINER_NAME }} \
+            --publish 3000:3000 \
             --network cinema-network \
             --restart unless-stopped \
             --label logging=promtail \
